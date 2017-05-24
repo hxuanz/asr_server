@@ -1,4 +1,9 @@
 # encoding: utf-8
+"""
+asr的实现：
+1 利用ffmpeg 转换语音文件格式 【百度只支持特定格式】
+2 调用百度在线API识别
+"""
 import subprocess
 import requests
 import json
@@ -20,7 +25,7 @@ headers = {'Content-Type': 'application/json'}
 
 def baidu_asr(wav_path, token):
     """
-    参考 http://yuyin.baidu.com/docs/asr/57
+    baidu asr api 参考 http://yuyin.baidu.com/docs/asr/57
     :param token:
     :return:
     """
@@ -31,7 +36,7 @@ def baidu_asr(wav_path, token):
     assert f.getnchannels() == 1, "仅支持单声道, %d" % f.getnchannels()
     wav_base64 = base64.b64encode(wav_data)
     f.close()
-    os.remove(wav_path)  #######
+    os.remove(wav_path)  ##删除临时文件
 
     url = 'http://vop.baidu.com/server_api'
     data = {
@@ -59,15 +64,16 @@ def convert2wav(data_params):
     file_in = "%s.%s" % (tmp_file_path, data_params['type'])
     file_out = "%s.wav" % (tmp_file_path)
 
+    # 数据流存为 文件
     av_data = base64.b64decode(data_params['data'])
     with open(file_in, 'wb') as f:
         f.write(av_data)
 
     cwd = os.getcwd().replace('\\', '/')
+    # 调用ffmpeg程序
     commond = "%s/ffmpeg.exe -i %s -ar 16000 -ac 1 %s" % (cwd, file_in, file_out)
-    print(commond)
     subprocess.call(commond, shell=True)
-    os.remove(file_in)  #######
+    os.remove(file_in)  #删除临时文件
     return file_out
 
 def asr_api(data_params, token):

@@ -1,4 +1,7 @@
 # encoding: utf-8
+"""
+    获取baidu token
+"""
 import requests
 import json
 

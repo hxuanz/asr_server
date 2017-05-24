@@ -1,17 +1,20 @@
+# encoding: utf-8
+"""
+    author： hxuanz
+    data: 20170524
+    desc: 基于falsk实现的asr web服务
+"""
 from flask import Flask
-
 from asr import asr_api
 from flask import request
 from baidu_token import TOKEN
-from urlparse import urlparse
 import traceback
 app = Flask(__name__)
 
 @app.route('/asr', methods=['POST'])
-def upload_file():
+def asr_server():
     try:
         data_params = dict(type= request.args['type'], data=request.data)
-        print data_params
         result = asr_api(data_params, TOKEN)
     except Exception as e:
         traceback.print_exc()
